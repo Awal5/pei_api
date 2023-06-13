@@ -4,8 +4,8 @@ import fs from "fs";
 export const getManagement = async (req, res) => {
   try {
     const management = await Management.findAll();
-    if (!management)
-      return res.status(404).json({ message: "Managements is Empty" });
+    if (management.length === 0)
+      return res.status(404).json({ message: "Managements Not Added" });
 
     res.status(200).json(management);
   } catch (error) {
@@ -15,9 +15,9 @@ export const getManagement = async (req, res) => {
 };
 
 export const getManagementById = async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
   try {
-    const management = await Management.findOne({ where: { id: id } });
+    const management = await Management.findOne({ where: { slug: slug } });
 
     if (!management)
       return res.status(404).json({ message: "Management Not Found" });
@@ -42,7 +42,7 @@ export const createManagement = async (req, res) => {
     if (!image)
       return res.status(422).json({ message: "Image Must Be Upload" });
 
-    await Management.create({
+    const management = await Management.create({
       name: name,
       image: image,
       position: position,
@@ -51,7 +51,7 @@ export const createManagement = async (req, res) => {
       twitter: `https://twitter.com/${twitter}`,
       linkedin: `https://linkedin.com/${linkedin}`,
     });
-    res.status(201).json({ message: "Management Created" });
+    res.status(201).json({ message: "Management Created", data: management });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something Wrong When Create Management" });
@@ -59,7 +59,7 @@ export const createManagement = async (req, res) => {
 };
 
 export const updateManagement = async (req, res) => {
-  const managementId = req.params.id;
+  const { slug } = req.params;
   const name = req.body.name;
   const image = req.file.path;
   const position = req.body.position;
@@ -68,14 +68,14 @@ export const updateManagement = async (req, res) => {
   const twitter = "https://twitter.com/" + req.body.twitter;
   const linkedin = "https://linkedin.com/" + req.body.linkedin;
   try {
-    const management = await Management.findByPk(managementId);
+    const management = await Management.findOne({ where: { slug: slug } });
     if (!management)
       return res.status(404).json({ message: "Management Not Found" });
 
     if (image && image !== management.image) {
       fs.unlinkSync(management.image);
     }
-    await management.update({
+    const newManagement = await management.update({
       name,
       image,
       position,
@@ -85,7 +85,9 @@ export const updateManagement = async (req, res) => {
       linkedin,
     });
 
-    res.status(200).json({ message: "Management Updated" });
+    res
+      .status(200)
+      .json({ message: "Management Updated", data: newManagement });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Something Wrong When Update Management" });
@@ -93,9 +95,9 @@ export const updateManagement = async (req, res) => {
 };
 
 export const deleteManagement = async (req, res) => {
-  const managementId = req.params.id;
+  const { slug } = req.params;
   try {
-    const management = await Management.findByPk(managementId);
+    const management = await Management.findOne({ where: { slug: slug } });
     if (!management)
       return res.status(404).json({ message: "Management Not Found" });
 

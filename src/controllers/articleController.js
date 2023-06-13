@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 export const getArticle = async (req, res) => {
   try {
     const response = await Article.findAll({
-      include: "article-images",
+      include: "articleImages",
     });
     if (response.length <= 0) {
       return res.status(404).json({ message: "Article is Empty" });
@@ -23,13 +23,13 @@ export const getArticle = async (req, res) => {
 };
 
 export const getArticleById = async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
   try {
     const article = await Article.findOne({
       where: {
-        id: id,
+        slug: slug,
       },
-      include: "article-images",
+      include: "articleImages",
     });
     if (!article) {
       return res.status(404).json({ message: "Artikel Not Found" });
@@ -61,26 +61,35 @@ export const createArticle = async (req, res) => {
 
     await Promise.all(imagePromises);
 
-    res.status(201).json({ message: "Article Created" });
+    res.status(201).json({
+      message: "Article Created",
+      data: article,
+      images: images,
+    });
   } catch (error) {
     console.log(error.message);
   }
 };
 
 export const updateArticle = async (req, res) => {
-  const articleId = req.params.id;
+  const { slug } = req.params;
   const title = req.body.title;
   const description = req.body.description;
   const images = req.files.map((file) => file.path);
   try {
-    const article = await Article.findByPk(articleId);
+    const article = await Article.findOne({ where: { slug: slug } });
     if (!article) return res.status(404).json({ message: "Article Not Found" });
 
-    const oldImages = await ArticleImage.findAll({ where: { articleId } });
+    const oldImages = await ArticleImage.findAll({
+      where: { articleId: article.id },
+    });
 
-    await Article.update({ title, description }, { where: { id: articleId } });
+    const newArticle = await Article.update(
+      { title, description },
+      { where: { slug: slug } }
+    );
 
-    await ArticleImage.destroy({ where: { articleId } });
+    await ArticleImage.destroy({ where: { articleId: article.id } });
 
     oldImages.forEach((image) => {
       const imagePath = path.join(__dirname, "../..", image.imagePath);
@@ -93,7 +102,9 @@ export const updateArticle = async (req, res) => {
 
     await Promise.all(newImagePromises);
 
-    res.status(200).json({ message: "Article Updated" });
+    res
+      .status(200)
+      .json({ message: "Article Updated", data: newArticle, images: images });
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.log(error.message);
@@ -101,22 +112,24 @@ export const updateArticle = async (req, res) => {
 };
 
 export const deleteArticle = async (req, res) => {
-  const articleId = req.params.id;
+  const { slug } = req.params;
   try {
-    const article = await Article.findByPk(articleId);
+    const article = await Article.findOne({ where: { slug: slug } });
 
     if (!article) return res.status(404).json({ message: "Article Not Found" });
 
-    const images = await ArticleImage.findAll({ where: { articleId } });
+    const images = await ArticleImage.findAll({
+      where: { articleId: article.id },
+    });
 
-    await ArticleImage.destroy({ where: { articleId } });
+    await ArticleImage.destroy({ where: { articleId: article.id } });
 
     images.forEach((image) => {
       const imagePath = path.join(__dirname, "../..", image.imagePath);
       fs.unlinkSync(imagePath);
     });
 
-    await Article.destroy({ where: { id: articleId } });
+    await Article.destroy({ where: { slug: slug } });
 
     res.status(200).json({ message: "Article Deleted" });
   } catch (error) {

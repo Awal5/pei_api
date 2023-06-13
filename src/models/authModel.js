@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize, UUIDV4 } from "sequelize";
 import db from "../config/database.js";
 
 const { DataTypes } = Sequelize;
@@ -6,6 +6,12 @@ const { DataTypes } = Sequelize;
 const Admin = db.define(
   "admin",
   {
+    id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      primaryKey: true,
+      defaultValue: UUIDV4,
+    },
     username: {
       type: DataTypes.STRING,
     },

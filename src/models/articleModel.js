@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize, UUIDV4 } from "sequelize";
 import db from "../config/database.js";
 import slugify from "sequelize-slugify";
 
@@ -7,6 +7,12 @@ const { DataTypes } = Sequelize;
 const Article = db.define(
   "articles",
   {
+    id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      primaryKey: true,
+      defaultValue: UUIDV4,
+    },
     title: { type: DataTypes.STRING, allowNull: false },
     slug: { type: DataTypes.STRING, unique: true },
     description: { type: DataTypes.STRING, allowNull: false },
@@ -20,7 +26,7 @@ const ArticleImage = db.define(
   "articles_images",
   {
     imagePath: { type: DataTypes.STRING },
-    articleId: { type: DataTypes.INTEGER, allowNull: false },
+    articleId: { type: DataTypes.UUID, allowNull: false },
   },
   {
     freezeTableName: true,
@@ -29,7 +35,7 @@ const ArticleImage = db.define(
 
 Article.hasMany(ArticleImage, {
   foreignKey: "articleId",
-  as: "article-images",
+  as: "articleImages",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });

@@ -12,9 +12,9 @@ export const getProduct = async (req, res) => {
 };
 
 export const getProductById = async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
   try {
-    const product = await Product.findOne({ where: { id: id } });
+    const product = await Product.findOne({ where: { slug: slug } });
 
     if (!product) {
       return res.status(404).json({ message: "Product Not Found" });
@@ -33,12 +33,12 @@ export const createProduct = async (req, res) => {
   try {
     if (!image)
       return res.status(422).json({ message: "Image Must be Upload" });
-    await Product.create({
+    const product = await Product.create({
       name,
       image,
       description,
     });
-    res.status(201).json({ message: "Product Created" });
+    res.status(201).json({ message: "Product Created", data: product });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something Wrong When Create Product" });
@@ -46,12 +46,12 @@ export const createProduct = async (req, res) => {
 };
 
 export const updateProduct = async (req, res) => {
-  const productId = req.params.id;
+  const { slug } = req.params;
   const name = req.body.name;
   const image = req.file.path;
   const description = req.body.description;
   try {
-    const product = await Product.findByPk(productId);
+    const product = await Product.findOne({ where: { slug: slug } });
     if (!product)
       return res.status(404).json({ message: "Product Not Available" });
 
@@ -59,12 +59,12 @@ export const updateProduct = async (req, res) => {
       fs.unlinkSync(product.image);
     }
 
-    await product.update({
+    const newProduct = await product.update({
       name,
       image,
       description,
     });
-    res.status(200).json({ message: "Product Updated" });
+    res.status(200).json({ message: "Product Updated", data: newProduct });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something Wrong When Update Product" });
@@ -73,8 +73,8 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
-    const product = await Product.findByPk(productId);
+    const { slug } = req.params;
+    const product = await Product.findOne({ where: { slug: slug } });
 
     if (!product)
       return res.status(404).json({ message: "Product not Available" });

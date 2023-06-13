@@ -11,17 +11,17 @@ import multipleImage from "../middleware/multerImage.js";
 const router = express.Router();
 
 router.get("/managements", getManagement);
-router.get("/management/:id", getManagementById);
+router.get("/management/:slug", getManagementById);
 router.post(
   "/management/create",
   multipleImage.single("image"),
   createManagement
 );
 router.put(
-  "/management/update/:id",
+  "/management/update/:slug",
   multipleImage.single("image"),
   updateManagement
 );
-router.delete("/management/delete/:id", deleteManagement);
+router.delete("/management/delete/:slug", deleteManagement);
 
 export default router;
