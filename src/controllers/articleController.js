@@ -12,13 +12,12 @@ export const getArticle = async (req, res) => {
       include: "articleImages",
     });
     if (response.length <= 0) {
-      return res.status(404).json({ message: "Article is Empty" });
+      return res.status(404).json({ message: "Article Kosong" });
     } else {
       res.status(200).json(response);
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
-    console.log(error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -32,11 +31,11 @@ export const getArticleById = async (req, res) => {
       include: "articleImages",
     });
     if (!article) {
-      return res.status(404).json({ message: "Artikel Not Found" });
+      return res.status(404).json({ message: "Artikel Tidak Ditemukan" });
     }
     res.status(200).json(article);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -44,9 +43,10 @@ export const createArticle = async (req, res) => {
   const title = req.body.title;
   const description = req.body.description;
   const images = req.files.map((file) => file.path);
+  console.log(images);
   try {
     if (req.files.length === 0)
-      return res.status(422).json({ message: "at Least Upload 1 Image" });
+      return res.status(422).json({ message: "Upload Minimal 1 Gambar" });
     const article = await Article.create({
       title: title,
       description: description,
@@ -67,7 +67,7 @@ export const createArticle = async (req, res) => {
       images: images,
     });
   } catch (error) {
-    console.log(error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -75,39 +75,56 @@ export const updateArticle = async (req, res) => {
   const { slug } = req.params;
   const title = req.body.title;
   const description = req.body.description;
-  const images = req.files.map((file) => file.path);
+  const images = req.files ? req.files.map((file) => file.path) : null;
   try {
     const article = await Article.findOne({ where: { slug: slug } });
-    if (!article) return res.status(404).json({ message: "Article Not Found" });
+    if (!article)
+      return res.status(404).json({ message: "Article Tidak Ditemukan" });
 
     const oldImages = await ArticleImage.findAll({
       where: { articleId: article.id },
     });
 
-    const newArticle = await Article.update(
-      { title, description },
-      { where: { slug: slug } }
-    );
+    // const newArticle = await Article.update(
+    //   {
+    //     title: title || article.title,
+    //     description: description || article.description,
+    //   },
+    //   { where: { slug: slug } }
+    // );
 
-    await ArticleImage.destroy({ where: { articleId: article.id } });
+    const updateArticle = {
+      title: title || article.title,
+      description: description || article.description,
+    };
 
-    oldImages.forEach((image) => {
-      const imagePath = path.join(__dirname, "../..", image.imagePath);
-      fs.unlinkSync(imagePath);
+    if (images.length > 0) {
+      await ArticleImage.destroy({ where: { articleId: article.id } });
+
+      for (const image of oldImages) {
+        const imagePath = path.join(__dirname, "../..", image.imagePath);
+        fs.unlinkSync(imagePath);
+      }
+
+      await Promise.all(
+        images.map((image) =>
+          ArticleImage.create({
+            imagePath: image,
+            articleId: article.id,
+          })
+        )
+      );
+    }
+    await Article.update(updateArticle, {
+      where: { slug: slug },
     });
-
-    const newImagePromises = images.map((image) =>
-      ArticleImage.create({ imagePath: image, articleId: article.id })
-    );
-
-    await Promise.all(newImagePromises);
-
-    res
-      .status(200)
-      .json({ message: "Article Updated", data: newArticle, images: images });
+    res.status(200).json({
+      message: "Article diupdate",
+      data: updateArticle,
+      images: images,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
-    console.log(error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -116,7 +133,8 @@ export const deleteArticle = async (req, res) => {
   try {
     const article = await Article.findOne({ where: { slug: slug } });
 
-    if (!article) return res.status(404).json({ message: "Article Not Found" });
+    if (!article)
+      return res.status(404).json({ message: "Article Tidak Ditemukan" });
 
     const images = await ArticleImage.findAll({
       where: { articleId: article.id },
@@ -131,8 +149,8 @@ export const deleteArticle = async (req, res) => {
 
     await Article.destroy({ where: { slug: slug } });
 
-    res.status(200).json({ message: "Article Deleted" });
+    res.status(200).json({ message: "Article dihapus" });
   } catch (error) {
-    console.log(error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

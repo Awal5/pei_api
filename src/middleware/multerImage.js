@@ -18,6 +18,7 @@ const fileFilter = (req, file, cb) => {
     cb(null, true);
   } else {
     cb(null, false);
+    console.log("Format Image tidak diterima");
   }
 };
 const multipleImage = multer({

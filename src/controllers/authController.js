@@ -35,10 +35,11 @@ export const login = async (req, res) => {
     const { username, password } = req.body;
     // mencari mencocokan username
     const admin = await Admin.findOne({ where: { username } });
-    if (!admin) return res.status(404).json({ msg: "Username not found" });
+    if (!admin)
+      return res.status(404).json({ msg: "Username Tidak Ditemukan" });
     // mencocokan password
     const match = await bcrypt.compare(password, admin.password);
-    if (!match) return res.status(400).json({ msg: "Wrong Password" });
+    if (!match) return res.status(400).json({ msg: "Password Salah" });
     const { id: adminId } = admin;
     // membuat access token
     const accessToken = jwt.sign(
@@ -82,7 +83,7 @@ export const logout = async (req, res) => {
       refresh_token: refreshToken,
     },
   });
-  //jika tidak ada admin, kembalika status 204
+  //jika tidak ada admin, kembalikan status 204
   if (!admin[0]) return res.sendStatus(204);
   const adminId = admin[0].id;
   // update refresh token di database menjadi null

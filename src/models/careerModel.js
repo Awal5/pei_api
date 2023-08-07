@@ -4,8 +4,8 @@ import slugify from "sequelize-slugify";
 
 const { DataTypes } = Sequelize;
 
-const Product = db.define(
-  "product",
+const Career = db.define(
+  "career",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,7 +13,7 @@ const Product = db.define(
       primaryKey: true,
       defaultValue: UUIDV4,
     },
-    name: { type: DataTypes.STRING, allowNull: false },
+    title: { type: DataTypes.STRING, allowNull: false },
     slug: { type: DataTypes.STRING, unique: true },
     image: { type: DataTypes.STRING, allowNull: false },
     description: {
@@ -26,11 +26,11 @@ const Product = db.define(
   }
 );
 
-slugify.slugifyModel(Product, {
-  source: ["name"],
+slugify.slugifyModel(Career, {
+  source: ["title"],
   overwrite: true,
   bulkUpdate: true,
 });
 
-export default Product;
+export default Career;
 // db.sync({ force: true });

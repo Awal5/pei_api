@@ -4,8 +4,8 @@ import slugify from "sequelize-slugify";
 
 const { DataTypes } = Sequelize;
 
-const Product = db.define(
-  "product",
+const Project = db.define(
+  "project",
   {
     id: {
       type: DataTypes.UUID,
@@ -26,11 +26,11 @@ const Product = db.define(
   }
 );
 
-slugify.slugifyModel(Product, {
+slugify.slugifyModel(Project, {
   source: ["name"],
   overwrite: true,
   bulkUpdate: true,
 });
 
-export default Product;
+export default Project;
 // db.sync({ force: true });

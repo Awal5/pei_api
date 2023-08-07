@@ -11,7 +11,7 @@ import multipleImage from "../middleware/multerImage.js";
 const router = express.Router();
 
 router.get("/products", getProduct);
-router.get("/products/:slug", getProductById);
+router.get("/product/:slug", getProductById);
 router.post("/product/create", multipleImage.single("image"), createProduct);
 router.put(
   "/product/update/:slug",

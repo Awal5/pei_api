@@ -5,6 +5,8 @@ import authRoute from "./src/routes/authRoute.js";
 import articleRoute from "./src/routes/articleRoute.js";
 import productRoute from "./src/routes/productRoute.js";
 import managementRoute from "./src/routes/managementRoute.js";
+import careerRoute from "./src/routes/careerRoute.js";
+import projectRoute from "./src/routes/projectRoute.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
@@ -24,18 +26,6 @@ db.authenticate()
     console.log("Error: ", e);
   });
 
-const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
-  ) {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
-
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
@@ -53,6 +43,8 @@ app.use("/auth", authRoute);
 app.use("/blog", articleRoute);
 app.use(productRoute);
 app.use(managementRoute);
+app.use(careerRoute);
+app.use(projectRoute);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server Listening to Port: ${PORT}`));
