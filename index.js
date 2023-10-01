@@ -5,7 +5,7 @@ import authRoute from "./src/routes/authRoute.js";
 import articleRoute from "./src/routes/articleRoute.js";
 import productRoute from "./src/routes/productRoute.js";
 import managementRoute from "./src/routes/managementRoute.js";
-import careerRoute from "./src/routes/careerRoute.js";
+
 import projectRoute from "./src/routes/projectRoute.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -43,7 +43,6 @@ app.use("/auth", authRoute);
 app.use("/blog", articleRoute);
 app.use(productRoute);
 app.use(managementRoute);
-app.use(careerRoute);
 app.use(projectRoute);
 
 // Start the server

@@ -67,7 +67,7 @@ export const login = async (req, res) => {
     console.log("Set refreshToken cookie:", res.cookie);
 
     // menghasilkan access token
-    res.json({ accessToken });
+    res.json({ accessToken, message: "Login Berhasil" });
   } catch (err) {
     res.status(500).json({ msg: "Internal Server Error" });
     console.log(err);

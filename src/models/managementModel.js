@@ -19,22 +19,19 @@ const Management = db.define(
     },
     slug: { type: DataTypes.STRING, unique: true },
     image: { type: DataTypes.STRING, allowNull: false },
-    position: { type: DataTypes.STRING, allowNull: false },
+    position: { type: DataTypes.TEXT, allowNull: false },
     description: { type: DataTypes.STRING, allowNull: false },
     facebook: {
       type: DataTypes.STRING,
       allowNull: false,
-      isRequired: true,
     },
     twitter: {
       type: DataTypes.STRING,
       allowNull: false,
-      isRequired: true,
     },
     linkedin: {
       type: DataTypes.STRING,
       allowNull: false,
-      isRequired: true,
     },
   },
   {
@@ -49,4 +46,4 @@ slugify.slugifyModel(Management, {
 });
 export default Management;
 
-// db.sync({ force: true });
+// db.sync();

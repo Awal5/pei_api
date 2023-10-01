@@ -17,7 +17,7 @@ const Product = db.define(
     slug: { type: DataTypes.STRING, unique: true },
     image: { type: DataTypes.STRING, allowNull: false },
     description: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
   },

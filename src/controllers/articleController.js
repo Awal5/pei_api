@@ -42,6 +42,7 @@ export const getArticleById = async (req, res) => {
 export const createArticle = async (req, res) => {
   const title = req.body.title;
   const description = req.body.description;
+  const category = req.body.category;
   const images = req.files.map((file) => file.path);
   console.log(images);
   try {
@@ -50,6 +51,7 @@ export const createArticle = async (req, res) => {
     const article = await Article.create({
       title: title,
       description: description,
+      category: category,
     });
 
     const imagePromises = images.map((image) => {
@@ -75,6 +77,8 @@ export const updateArticle = async (req, res) => {
   const { slug } = req.params;
   const title = req.body.title;
   const description = req.body.description;
+  const category = req.body.category;
+
   const images = req.files ? req.files.map((file) => file.path) : null;
   try {
     const article = await Article.findOne({ where: { slug: slug } });
@@ -96,6 +100,7 @@ export const updateArticle = async (req, res) => {
     const updateArticle = {
       title: title || article.title,
       description: description || article.description,
+      category: category || article.category,
     };
 
     if (images.length > 0) {

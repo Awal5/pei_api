@@ -37,15 +37,8 @@ export const createManagement = async (req, res) => {
   const linkedin = req.body.linkedin;
 
   try {
-    if (
-      !name ||
-      !position ||
-      !description ||
-      !facebook ||
-      !twitter ||
-      !linkedin
-    )
-      return res.status(400).json({ message: "Semua Field Harus Diisi" });
+    if (!name || !position || !description)
+      return res.status(400).json({ message: "Field Harus Diisi" });
     if (!image)
       return res.status(422).json({ message: "Gambar Harus Diupload" });
 
@@ -54,11 +47,13 @@ export const createManagement = async (req, res) => {
       image: image,
       position: position,
       description: description,
-      facebook: facebook,
-      twitter: twitter,
-      linkedin: linkedin,
+      facebook: facebook ? facebook : "",
+      twitter: twitter ? twitter : "",
+      linkedin: linkedin ? linkedin : "",
     });
-    res.status(201).json({ message: "Direksi Ditambahkan", data: management });
+    res
+      .status(201)
+      .json({ message: "Manajemen Ditambahkan", data: management });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }

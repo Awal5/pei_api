@@ -15,7 +15,9 @@ const Article = db.define(
     },
     title: { type: DataTypes.STRING, allowNull: false },
     slug: { type: DataTypes.STRING, unique: true },
-    description: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.TEXT, allowNull: false },
+    category: { type: DataTypes.STRING },
+    click: { type: DataTypes.INTEGER },
   },
   {
     freezeTableName: true,
